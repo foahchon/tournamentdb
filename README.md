@@ -46,5 +46,5 @@ To use the tournament API, import the module into any Python file. The following
 - `playerStandings(tournament_id=1)` - returns list of tuples containing ID, name, wins, and matches for a player each row.
 - `def swissPairings(tournament_id=1)` - returns pairings of players for the next round of a tournament.
 
-# Thanks
+## Thanks
 Thanks for checking out my project. Have fun and enjoy!
