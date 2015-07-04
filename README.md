@@ -1,11 +1,12 @@
 # Swiss-Style Tournament Database
 
-##Table of contents
+## Table of contents
 - [What is it?](#what-is-it)
 - [Features](#features)
 - [What's included?](#what-s-included-)
 - [Setup instructions](#setup-instructions)
 - [Using the API](#using-the-api)
+- [Running the unit tests](#running-the-unit-tests)
 - [Thanks](#thanks)
 
 ## What is it?
@@ -28,7 +29,7 @@ A swiss-style tournament database configuration with corresponding API for playe
 
 ## Setup instructions
 
-To setup the database, simply open up a terminal window and type:
+To setup the database, simply open up a terminal window and type
 
 `psql -f tournament.sql`
 
@@ -45,6 +46,18 @@ To use the tournament API, import the module into any Python file. The following
 - `reportMatch(winner, loser, tournament_id=1, draw=False)` - records result of match between `winner` and `loser`. If draw is `True`, no wins or losses are recorded.
 - `playerStandings(tournament_id=1)` - returns list of tuples containing ID, name, wins, and matches for a player each row.
 - `def swissPairings(tournament_id=1)` - returns pairings of players for the next round of a tournament.
+
+## Running the unit tests
+
+To run the unit tests, open up a terminal window and type
+
+`python tournament_test.py`
+
+to run the basic unit tests, or
+
+`python extended_tests.py`
+
+to run the more advanced unit tests.
 
 ## Thanks
 Thanks for checking out my project. Have fun and enjoy!

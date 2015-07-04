@@ -14,16 +14,16 @@ def testDeleteMatches():
 
 def testDelete():
     deleteMatches(1)
-    deleteMatches(2)
     deletePlayers(1)
+    deleteMatches(2)
     deletePlayers(2)
     print "2. Player records can be deleted."
 
 
 def testCount():
     deleteMatches(1)
-    deleteMatches(2)
     deletePlayers(1)
+    deleteMatches(2)
     deletePlayers(2)
     c1 = countPlayers(1)
     c2 = countPlayers(2)
@@ -37,8 +37,8 @@ def testCount():
 
 def testRegister():
     deleteMatches(1)
-    deleteMatches(2)
     deletePlayers(1)
+    deleteMatches(2)
     deletePlayers(2)
     registerPlayer("Chandra Nalaar")
     registerPlayer("B.J. Blazkowitz", 2)
@@ -52,8 +52,8 @@ def testRegister():
 
 def testRegisterCountDelete():
     deleteMatches(1)
-    deleteMatches(2)
     deletePlayers(1)
+    deleteMatches(2)
     deletePlayers(2)
     registerPlayer("Markov Chaney")
     registerPlayer("Joe Malik")
@@ -111,8 +111,8 @@ def testStandingsBeforeMatches():
 
 def testReportMatches():
     deleteMatches(1)
-    deleteMatches(2)
     deletePlayers(1)
+    deleteMatches(2)
     deletePlayers(2)
     registerPlayer("Bruno Walton")
     registerPlayer("Boots O'Neal")
@@ -151,8 +151,8 @@ def testReportMatches():
 def testPairings():
     deleteMatches(1)
     deletePlayers(1)
-    deletePlayers(2)
     deleteMatches(2)
+    deletePlayers(2)
     registerPlayer("Twilight Sparkle")
     registerPlayer("Fluttershy")
     registerPlayer("Applejack")
@@ -196,10 +196,10 @@ def testPairings():
 
 
 def testByes():
-    deletePlayers(1)
-    deletePlayers(2)
     deleteMatches(1)
+    deletePlayers(1)
     deleteMatches(2)
+    deletePlayers(2)
 
     registerPlayer("Flynn Taggart", 1)
 
@@ -226,10 +226,10 @@ def testByes():
 
 
 def testNoRepeatMatches():
-    deletePlayers(1)
-    deletePlayers(2)
     deleteMatches(1)
+    deletePlayers(1)
     deleteMatches(2)
+    deletePlayers(2)
 
     registerPlayer("Flynn Taggart", 1)
     registerPlayer("B.J. Blackowicz", 1)
@@ -249,10 +249,10 @@ def testNoRepeatMatches():
 
 
 def testDrawDoesNotAffectStandings():
-    deletePlayers(1)
-    deletePlayers(2)
     deleteMatches(1)
+    deletePlayers(1)
     deleteMatches(2)
+    deletePlayers(2)
 
     registerPlayer("Flynn Taggart", 1)
     registerPlayer("B.J. Blackowicz", 1)

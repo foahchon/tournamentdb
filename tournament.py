@@ -7,9 +7,12 @@ import psycopg2
 from tournament_exception import TournamentException
 
 
-def connect():
+def connect(database_name="tournament"):
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+    db_conn = psycopg2.connect("dbname={}".format(database_name))
+    db_cursor = db_conn.cursor()
+
+    return db_conn, db_cursor
 
 
 def deleteMatches(tournament_id=1):
@@ -20,17 +23,17 @@ def deleteMatches(tournament_id=1):
 
     """
 
-    db_conn = connect()
-    db_cursor = db_conn.cursor()
+    db_conn, db_cursor = connect()
 
-    db_cursor.execute("delete from matches "
-                      "where tournament_id = %s;",
-                      (tournament_id,))
+    query = "DELETE FROM matches " \
+            "WHERE tournament_id = %s;"
 
+    params = (tournament_id,)
+
+    db_cursor.execute(query, params)
     db_conn.commit()
 
-    db_cursor.close()
-    db_conn.close()
+    _closeDb(db_conn, db_cursor)
 
 
 def deletePlayers(tournament_id=1):
@@ -40,17 +43,17 @@ def deletePlayers(tournament_id=1):
       tournament_id: ID of tournament from which players are being deleted
     """
 
-    db_conn = connect()
-    db_cursor = db_conn.cursor()
+    db_conn, db_cursor = connect()
 
-    db_cursor.execute("delete from players "
-                      "where tournament_id = %s;",
-                      (tournament_id,))
+    query = "DELETE FROM players " \
+            "WHERE tournament_id = %s;"
 
+    params = (tournament_id,)
+
+    db_cursor.execute(query, params)
     db_conn.commit()
 
-    db_cursor.close()
-    db_conn.close()
+    _closeDb(db_conn, db_cursor)
 
 
 def countPlayers(tournament_id=1):
@@ -60,16 +63,17 @@ def countPlayers(tournament_id=1):
         tournament_id: ID of tournament for which players are being counted
     """
 
-    db_conn = connect()
-    db_cursor = db_conn.cursor()
+    db_conn, db_cursor = connect()
 
-    db_cursor.execute("select count(*) from players where tournament_id = %s;",
-                      (tournament_id,))
+    query = "SELECT COUNT(*) FROM players " \
+            "WHERE tournament_id = %s;"
 
+    params = (tournament_id,)
+
+    db_cursor.execute(query, params)
     player_count = db_cursor.fetchone()[0]  # Column 0 contains number of players.
 
-    db_cursor.close()
-    db_conn.close()
+    _closeDb(db_conn, db_cursor)
 
     return int(player_count)  # Convert to int before returning.
 
@@ -85,16 +89,17 @@ def registerPlayer(name, tournament_id=1):
       tournament_id: ID of tournament player is registering for
     """
 
-    db_conn = connect()
-    db_cursor = db_conn.cursor()
+    db_conn, db_cursor = connect()
 
-    db_cursor.execute("insert into players (name, tournament_id) values (%s, %s);",
-                      (name, tournament_id))
+    query = "INSERT INTO players (name, tournament_id)" \
+            "VALUES (%s, %s);"
 
+    paramters = (name, tournament_id)
+
+    db_cursor.execute(query, paramters)
     db_conn.commit()
 
-    db_cursor.close()
-    db_conn.close()
+    _closeDb(db_conn, db_cursor)
 
     _assignBye(tournament_id)
 
@@ -116,17 +121,17 @@ def playerStandings(tournament_id=1):
         matches: the number of matches the player has played
     """
 
-    db_conn = connect()
-    db_cursor = db_conn.cursor()
+    db_conn, db_cursor = connect()
 
-    db_cursor.execute("select ps.id, ps.name, ps.wins, ps.matches from "
-                      "(select * from player_standings where tournament_id = %s) ps;",
-                      (tournament_id,))
+    query = "SELECT ps.id, ps.name, ps.wins, ps.matches FROM " \
+            "(SELECT * FROM player_standings WHERE tournament_id = %s) ps;"
 
+    params = (tournament_id,)
+
+    db_cursor.execute(query, params)
     results = db_cursor.fetchall()
 
-    db_cursor.close()
-    db_conn.close()
+    _closeDb(db_conn, db_cursor)
 
     return results
 
@@ -143,13 +148,16 @@ def reportMatch(winner, loser, tournament_id=1, draw=False):
     """
 
     if not draw:
-        db_conn = connect()
-        db_cursor = db_conn.cursor()
+        db_conn, db_cursor = connect()
 
         # Select player rows to ensure players are in the correct tournament.
-        db_cursor.execute("select tournament_id from players where id = %s or id = %s;",
-                          (winner, loser))
+        player_row_query = "SELECT tournament_id " \
+                           "FROM players " \
+                           "WHERE id = %s OR id = %s;"
 
+        player_row_params = (winner, loser)
+
+        db_cursor.execute(player_row_query, player_row_params)
         player_rows = db_cursor.fetchall()
 
         # Make sure that winner and loser are not equal, that both players are registered
@@ -157,25 +165,30 @@ def reportMatch(winner, loser, tournament_id=1, draw=False):
         if winner != loser and (db_cursor.rowcount != 2
                                 or player_rows[0][0] != tournament_id
                                 or player_rows[1][0] != tournament_id):
-            raise TournamentException("Both players must exist and be registered for the correct tournament.")
+            raise TournamentException("Both players must exist and be registered "
+                                      "for the correct tournament.")
 
         # Ensure that players have not already played each other.
-        db_cursor.execute("select count(*) from matches "
-                          "where winner_id = %(winner)s and loser_id = %(loser)s "
-                          "or winner_id = %(loser)s and loser_id = %(winner)s;",
-                          {'winner': winner, 'loser': loser})
+        duplicate_match_query = "SELECT count(*) FROM matches " \
+                                "WHERE winner_id = %(winner)s AND loser_id = %(loser)s " \
+                                "OR winner_id = %(loser)s AND loser_id = %(winner)s;"
+
+        duplicate_match_params = {'winner': winner, 'loser': loser}
+
+        db_cursor.execute(duplicate_match_query, duplicate_match_params)
 
         if db_cursor.fetchone()[0] != 0:
             raise TournamentException("Players can only have played each other once.")
 
-        db_cursor.execute("insert into matches (winner_id, loser_id, tournament_id) "
-                          "values (%s, %s, %s);",
-                          (winner, loser, tournament_id))
+        insert_query = "INSERT INTO matches (winner_id, loser_id, tournament_id) " \
+                       "VALUES (%s, %s, %s);"
 
+        insert_params = (winner, loser, tournament_id)
+
+        db_cursor.execute(insert_query, insert_params)
         db_conn.commit()
 
-        db_cursor.close()
-        db_conn.close()
+        _closeDb(db_conn, db_cursor)
 
 
 def swissPairings(tournament_id=1):
@@ -199,16 +212,13 @@ def swissPairings(tournament_id=1):
 
     standings = playerStandings(tournament_id)
 
-    results = []
-
     # Player standings are already sorted by wins, so just select pairs
     # from rows returned by playerStandings() function. Player in last place
-    # is not paired.
-    for i in range(0, len(standings) - 1, 2):
-        results.append((standings[i][0], standings[i][1],
-                        standings[i + 1][0], standings[i + 1][1]))
+    # is not paired if number of players is odd.
 
-    return results
+    return [(standings[i][0], standings[i][1],
+             standings[i + 1][0], standings[i + 1][1])
+            for i in range(0, len(standings) - 1, 2)]
 
 
 def _assignBye(tournament_id=1):
@@ -219,30 +229,48 @@ def _assignBye(tournament_id=1):
     Args:
       tournament_id: tournament ID which bye may be assigned to
     """
-    db_conn = connect()
-    db_cursor = db_conn.cursor()
+    db_conn, db_cursor = connect()
 
     # If number of players registered for a given tournament is odd, assign
     # a bye. Otherwise, revoke any previously assigned bye by deleting from
     # the assigned_byes table.
     if countPlayers(tournament_id) % 2 != 0:
         # Bye is automatically assigned to the lowest player ID.
-        db_cursor.execute("select id from players "
-                          "where tournament_id = %s "
-                          "order by id limit 1;",
-                          (tournament_id,))
+        low_player_id_query = "SELECT id FROM players " \
+                              "WHERE tournament_id = %s " \
+                              "ORDER BY id LIMIT 1;"
 
+        low_player_id_params = (tournament_id,)
+
+        db_cursor.execute(low_player_id_query, low_player_id_params)
         player_id = db_cursor.fetchone()[0]
 
-        db_cursor.execute("insert into assigned_byes "
-                          "(tournament_id, player_id) values (%s, %s);",
-                          (tournament_id, player_id))
+        insert_query = "INSERT INTO assigned_byes (tournament_id, player_id)" \
+                       "VALUES (%s, %s);"
+
+        insert_params = (tournament_id, player_id)
+
+        db_cursor.execute(insert_query, insert_params)
     else:
-        db_cursor.execute("delete from assigned_byes "
-                          "where tournament_id = %s;",
-                          (tournament_id,))
+        delete_query = "DELETE FROM assigned_byes " \
+                       "WHERE tournament_id = %s;"
+
+        delete_params = (tournament_id,)
+
+        db_cursor.execute(delete_query, delete_params)
 
     db_conn.commit()
+
+    _closeDb(db_conn, db_cursor)
+
+
+def _closeDb(db_conn, db_cursor):
+    """Closes database connection and cursor.
+
+    Args:
+      db_conn: Database connection object
+      db_cursor: Database cursor object
+    """
 
     db_cursor.close()
     db_conn.close()
