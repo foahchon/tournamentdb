@@ -81,19 +81,19 @@ The standings reflect that Flynn Taggart now has one win and one match, compared
     >>> registerPlayer("Commander Keen")
     >>> registerPlayer("Dangerous Dave")
     >>> playerStandings()
-    [(1, 'Flynn Taggart', 1L, 1L), (2, 'B.J. Blazkowicz', 0L, 1L), (3,         'Commander Keen', 0L, 0L), (4, 'Dangerous Dave', 0L, 0L)]
+    [(1, 'Flynn Taggart', 1L, 1L), (2, 'B.J. Blazkowicz', 0L, 1L), (3, 'Commander Keen', 0L, 0L), (4, 'Dangerous Dave', 0L, 0L)]
     >>> reportMatch(1, 3)
     >>> reportMatch(1, 4)
     >>> reportMatch(4, 3)
     >>> reportMatch(4, 2)
     >>> reportMatch(2, 3)
     >>> playerStandings()
-    [(1, 'Flynn Taggart', 3L, 3L), (4, 'Dangerous Dave', 2L, 3L), (2, 'B.J.    Blazkowicz', 1L, 3L), (3, 'Commander Keen', 0L, 3L)]
+    [(1, 'Flynn Taggart', 3L, 3L), (4, 'Dangerous Dave', 2L, 3L), (2, 'B.J. Blazkowicz', 1L, 3L), (3, 'Commander Keen', 0L, 3L)]
     
 And if we take a look at the swiss pairings:
 
     >>> swissPairings()
-    [(1, 'Flynn Taggart', 4, 'Dangerous Dave'), (2, 'B.J. Blazkowicz', 3,      'Commander Keen')]
+    [(1, 'Flynn Taggart', 4, 'Dangerous Dave'), (2, 'B.J. Blazkowicz', 3, 'Commander Keen')]
     
 We see that players with similar win counts are paired together.
 
