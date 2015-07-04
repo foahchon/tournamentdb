@@ -1,7 +1,8 @@
+-- Drop database and re-create
 DROP DATABASE IF EXISTS tournament;
 CREATE DATABASE tournament;
 
--- Connect tournament database
+-- Connect to created database
 \c tournament
 
 -- Drop existing tables and views
