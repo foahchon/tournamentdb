@@ -1,7 +1,7 @@
 # Swiss-Style Tournament Database
 
 ##Table of contents
-- [What is it?](#what-is-it-)
+- [What is it?](#what-is-it)
 - [Features](#features)
 - [What's included?](#what-s-included-)
 - [Setup instructions](#setup-instructions)
