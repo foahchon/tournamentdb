@@ -43,5 +43,5 @@ CREATE VIEW player_standings AS
 	((SELECT COUNT(*) FROM matches m WHERE m.winner_id = p.id OR m.loser_id = p.id) +
 	(SELECT COUNT(*) FROM assigned_byes b WHERE p.id = b.player_id)) AS matches
 	FROM players p
-	ORDER BY wins) q
-	ORDER BY q.wins / greatest(q.matches, 1);
+	ORDER BY wins DESC) q
+	ORDER BY (q.wins / greatest(q.matches, 1)) DESC;
