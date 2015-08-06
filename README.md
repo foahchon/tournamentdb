@@ -36,6 +36,10 @@ To setup the database, simply open up a terminal window and type:
 
 Ensure that the `tournament.sql` file is in your current working directory and that PostgreSQL is installed on your machine. Running this file will connect to a database on the server called `tournament` and create the necessary tables and views for use with the API.
 
+There is only one dependency required to run this project: `psycopg2`. To install it, open a console window and type the following:
+
+`pip install psycopg2`
+
 ## Using the API
 
 To use the tournament API, import the module into any Python file or into a Python interpreter session using `from tournament import *` (as always, insure `tournament.py` is in your working directory). The following functions are available:

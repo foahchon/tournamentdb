@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS players(
 
 -- Matches table: tracks winners and losers, along with tournament id
 CREATE TABLE IF NOT EXISTS matches(
-	winner_id INT REFERENCES players(id),
-	loser_id INT REFERENCES players(id),
+	winner_id INT REFERENCES players(id) ON DELETE CASCADE,
+	loser_id INT REFERENCES players(id) ON DELETE CASCADE,
 	tournament_id INT NOT NULL,
 	PRIMARY KEY(winner_id, loser_id, tournament_id)
 );
